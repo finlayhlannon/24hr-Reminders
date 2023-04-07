@@ -1,0 +1,98 @@
+:root {
+    --tea-green: #def2c8ff;
+    --tea-green-2: #c5dac1ff;
+    --ash-gray: #bcd0c7ff;
+    --ash-gray-2: #a9b2acff;
+    --battleship-gray: #898980ff;
+}
+
+body {
+    background-color: rgb(241, 236, 226);
+    color: rgb(51, 51, 51);
+    font-size: 1.2rem;
+}
+
+header {
+    color: rgb(66, 66, 66);
+    text-align: left;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    margin-left:50px;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+main {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+form {
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    margin-bottom: 2rem;
+    border: none;
+    outline: none;
+    margin-left:-250px;
+    background-color: none;
+}
+
+input[type="text"] {
+    width: 70%;
+    border: none;
+    border-bottom: 2px solid var(--ash-gray-2);
+    padding: 0.5rem;
+    margin-right: 1rem;
+}
+
+button[type="submit"] {
+    background-color: var(--battleship-gray);
+    color: var(--tea-green);
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    transition: all 0.2s ease-in-out;
+    background-color: none;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    margin-left:-200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: left;
+
+}
+
+li:hover {
+    background-color: rgb(235, 229, 225);
+    transform: scale(1.03);
+  }
+
+  li span {
+    margin-right: -26rem;
+    width: 450px;
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+li button {
+    background-color: var(--ash-gray);
+    color: var(--battleship-gray);
+    border: none;
+    padding: 0.2rem 0.5rem;
+    cursor: pointer;
+}
+
+.timer {
+    margin-left: 1rem;
+    font-weight: bold;
+}
