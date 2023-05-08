@@ -64,7 +64,7 @@ function displayReminders() {
       } else if (hours > 0) {
         timerText.textContent = `${hours}h`;
       } else {
-        timerText.textContent = `${minutes}ms`;
+        timerText.textContent = `${minutes}m`;
       }
     }, 1000);
   });
