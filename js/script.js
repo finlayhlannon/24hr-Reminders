@@ -1,17 +1,39 @@
-
 let reminders = [];
 
 function addReminder() {
   let input = document.getElementById("reminder-input");
   let reminderText = input.value.trim();
 
-  if (reminderText !== "") {
+  if (reminderText.includes("/")) {
+    let parts = reminderText.split("/");
+    let afterSlash = parseInt(parts[1].trim()) + 1;
+
+    if (!isNaN(afterSlash)) {
+      let reminder = {
+        text: reminderText,
+        time: new Date(),
+        remainingTime: afterSlash * 60 * 60 * 1000,
+        expired: false,
+        timerId: null
+      };
+
+      reminders.push(reminder);
+
+      // Clear the input field
+      input.value = "";
+
+      // Display the reminder list
+      displayReminders();
+    }
+  } else if (reminderText !== "") {
     let reminder = {
       text: reminderText,
       time: new Date(),
+      remainingTime: 25 * 60 * 60 * 1000,
       expired: false,
       timerId: null
     };
+
     reminders.push(reminder);
 
     // Clear the input field
@@ -22,6 +44,7 @@ function addReminder() {
   }
 }
 
+
 function displayReminders() {
   let reminderList = document.getElementById("reminder-list");
   reminderList.innerHTML = "";
@@ -29,9 +52,10 @@ function displayReminders() {
   reminders.forEach(function(reminder) {
     let listItem = document.createElement("li");
 
-    // Create the reminder text
+    // Create the reminder text (without anything after the slash)
     let reminderText = document.createElement("span");
-    reminderText.textContent = reminder.text;
+    let textBeforeSlash = reminder.text.split("/")[0].trim();
+    reminderText.textContent = textBeforeSlash;
     listItem.appendChild(reminderText);
 
     // Create the timer text
@@ -53,14 +77,13 @@ function displayReminders() {
     // Start the timer
     reminder.timerId = setInterval(function() {
         let timeDiff = new Date() - reminder.time;
-        let remainingTime = 24 * 60 * 60 * 1000 - timeDiff;
-      
+        let remainingTime = reminder.remainingTime - timeDiff;
+
         let hours = Math.floor(remainingTime / (60 * 60 * 1000));
         let minutes = Math.floor((remainingTime % (60 * 60 * 1000)) / (60 * 1000));
         let secs = Math.floor((remainingTime % (60 * 1000)) / 1000);
 
-      
-        if (hours < 0) {
+        if (remainingTime <= 0) {
           reminder.expired = true;
           listItem.style.textDecoration = "line-through";
           timerText.textContent = "Expired";
@@ -76,6 +99,8 @@ function displayReminders() {
       
   });
 }
+
+
 
 // Add event listener for form submission
 document.getElementById("reminder-form").addEventListener("submit", function(event) {
