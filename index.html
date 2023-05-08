@@ -13,7 +13,7 @@
     </header>
     <main>
         <form id="reminder-form">
-            <input type="text" id="reminder-input" placeholder="Add Reminder..." autocomplete="off" style="border: none; outline: none; background-color: none; background-color: rgb(241, 236, 226);">
+            <input type="text" id="reminder-input" placeholder="Add Reminder..." onfocus="this.placeholder='Hint: type / to set custom time'" onblur="this.placeholder='Add Reminder...'" autocomplete="off" style="border: none; outline: none; background-color: none; background-color: rgb(241, 236, 226);">
         </form>
         <ul id="reminder-list"></ul>
     </main>
