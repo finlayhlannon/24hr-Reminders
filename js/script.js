@@ -1,109 +1,93 @@
 let reminders = [];
 
 function addReminder() {
-  let input = document.getElementById("reminder-input");
+  const input = document.getElementById("reminder-input");
   let reminderText = input.value.trim();
+  const [textBeforeSlash, afterSlash] = reminderText.split("/").map(s => s.trim());
 
-  if (reminderText.includes("/")) {
-    let parts = reminderText.split("/");
-    let afterSlash = parseInt(parts[1].trim()) + 1;
+  let remainingTime = 25 * 60 * 60 * 1000;
+  if (afterSlash && !isNaN(parseInt(afterSlash))) {
+    remainingTime = (parseInt(afterSlash) + 1) * 60 * 60 * 1000;
+  }
 
-    if (!isNaN(afterSlash)) {
-      let reminder = {
-        text: reminderText,
-        time: new Date(),
-        remainingTime: afterSlash * 60 * 60 * 1000,
-        expired: false,
-        timerId: null
-      };
+  const reminder = {
+    text: reminderText,
+    time: new Date().getTime(), // Save the time as a timestamp
+    remainingTime: remainingTime,
+    expired: false,
+    timerId: null,
+  };
 
-      reminders.push(reminder);
+  reminders.push(reminder);
+  input.value = "";
+  saveReminders(); // Save the reminders to localStorage
+  displayReminders();
+}
 
-      // Clear the input field
-      input.value = "";
+function displayReminders() {
+  const reminderList = document.getElementById("reminder-list");
+  reminderList.innerHTML = "";
 
-      // Display the reminder list
+  reminders.forEach((reminder) => {
+    const listItem = document.createElement("li");
+    const reminderText = document.createElement("span");
+    const timerText = document.createElement("span");
+
+    [reminderText.textContent] = reminder.text.split("/");
+    timerText.style.float = "right";
+
+    listItem.addEventListener("click", () => {
+      clearInterval(reminder.timerId);
+      reminders.splice(reminders.indexOf(reminder), 1);
+      saveReminders(); // Save the reminders to localStorage
       displayReminders();
-    }
-  } else if (reminderText !== "") {
-    let reminder = {
-      text: reminderText,
-      time: new Date(),
-      remainingTime: 25 * 60 * 60 * 1000,
-      expired: false,
-      timerId: null
-    };
+    });
 
-    reminders.push(reminder);
+    listItem.appendChild(reminderText);
+    listItem.appendChild(timerText);
+    reminderList.appendChild(listItem);
 
-    // Clear the input field
-    input.value = "";
+    reminder.timerId = setInterval(() => {
+      const timeDiff = new Date().getTime() - reminder.time; // Calculate the time difference from the timestamp
+      const remainingTime = reminder.remainingTime - timeDiff;
+      const hours = Math.floor(remainingTime / (60 * 60 * 1000));
+      const minutes = Math.floor((remainingTime % (60 * 60 * 1000)) / (60 * 1000));
+      const seconds = Math.floor((remainingTime % (60 * 1000)) / 1000);
 
-    // Display the reminder list
+      if (remainingTime <= 0) {
+        reminder.expired = true;
+        listItem.style.textDecoration = "line-through";
+        timerText.textContent = "Expired";
+        clearInterval(reminder.timerId);
+      } else if (hours > 24) {
+        timerText.textContent = "more than 24h";
+      } else if (hours > 0) {
+        timerText.textContent = `${hours}h`;
+      } else {
+        timerText.textContent = `${minutes}ms`;
+      }
+    }, 1000);
+  });
+}
+
+function saveReminders() {
+  localStorage.setItem("reminders", JSON.stringify(reminders)); // Save the reminders as a JSON string
+}
+
+function loadReminders() {
+  const savedReminders = localStorage.getItem("reminders");
+  if (savedReminders) {
+    reminders = JSON.parse(savedReminders); // Parse the JSON string to an object
     displayReminders();
   }
 }
 
-
-function displayReminders() {
-  let reminderList = document.getElementById("reminder-list");
-  reminderList.innerHTML = "";
-
-  reminders.forEach(function(reminder) {
-    let listItem = document.createElement("li");
-
-    // Create the reminder text (without anything after the slash)
-    let reminderText = document.createElement("span");
-    let textBeforeSlash = reminder.text.split("/")[0].trim();
-    reminderText.textContent = textBeforeSlash;
-    listItem.appendChild(reminderText);
-
-    // Create the timer text
-    let timerText = document.createElement("span");
-    timerText.style.float = "right";
-    listItem.appendChild(timerText);
-
-    // Add event listener to remove reminder on click
-    listItem.addEventListener("click", function() {
-      clearInterval(reminder.timerId);
-      reminders = reminders.filter(function(r) {
-        return r !== reminder;
-      });
-      displayReminders();
-    });
-
-    reminderList.appendChild(listItem);
-
-    // Start the timer
-    reminder.timerId = setInterval(function() {
-        let timeDiff = new Date() - reminder.time;
-        let remainingTime = reminder.remainingTime - timeDiff;
-
-        let hours = Math.floor(remainingTime / (60 * 60 * 1000));
-        let minutes = Math.floor((remainingTime % (60 * 60 * 1000)) / (60 * 1000));
-        let secs = Math.floor((remainingTime % (60 * 1000)) / 1000);
-
-        if (remainingTime <= 0) {
-          reminder.expired = true;
-          listItem.style.textDecoration = "line-through";
-          timerText.textContent = "Expired";
-          clearInterval(reminder.timerId);
-        } else if (hours < 1 && minutes < 1) {
-            timerText.textContent = `${secs}s`;
-        } else if (hours < 1 && minutes > 0) {
-          timerText.textContent = `${minutes}m`;
-        }else{
-            timerText.textContent = `${hours}h`;
-        }
-      }, 1000); // Update the timer every second
-      
-  });
-}
-
-
-
-// Add event listener for form submission
-document.getElementById("reminder-form").addEventListener("submit", function(event) {
+document.getElementById("reminder-form").addEventListener("submit", (event) => {
   event.preventDefault();
   addReminder();
+});
+
+// Load the reminders from localStorage when the page is loaded
+window.addEventListener("load", () => {
+  loadReminders();
 });
