@@ -54,7 +54,7 @@ function displayReminders() {
       const minutes = Math.floor((remainingTime % (60 * 60 * 1000)) / (60 * 1000));
       const seconds = Math.floor((remainingTime % (60 * 1000)) / 1000);
 
-      if (remainingTime <= 0) {
+      if (hours < 1) {
         reminder.expired = true;
         listItem.style.textDecoration = "line-through";
         timerText.textContent = "Expired";
