@@ -28,46 +28,48 @@ function displayReminders() {
   const reminderList = document.getElementById("reminder-list");
   reminderList.innerHTML = "";
 
-  reminders.forEach((reminder) => {
-    const listItem = document.createElement("li");
-    const reminderText = document.createElement("span");
-    const timerText = document.createElement("span");
+  reminders
+    .sort((a, b) => a.remainingTime - b.remainingTime) // Sort the reminders by remaining time
+    .forEach((reminder) => {
+      const listItem = document.createElement("li");
+      const reminderText = document.createElement("span");
+      const timerText = document.createElement("span");
 
-    [reminderText.textContent] = reminder.text.split("/");
-    timerText.style.float = "right";
+      [reminderText.textContent] = reminder.text.split("/");
+      timerText.style.float = "right";
 
-    listItem.addEventListener("click", () => {
-      clearInterval(reminder.timerId);
-      reminders.splice(reminders.indexOf(reminder), 1);
-      saveReminders(); // Save the reminders to localStorage
-      displayReminders();
-    });
-
-    listItem.appendChild(reminderText);
-    listItem.appendChild(timerText);
-    reminderList.appendChild(listItem);
-
-    reminder.timerId = setInterval(() => {
-      const timeDiff = new Date().getTime() - reminder.time; // Calculate the time difference from the timestamp
-      const remainingTime = reminder.remainingTime - timeDiff;
-      const hours = Math.floor(remainingTime / (60 * 60 * 1000));
-      const minutes = Math.floor((remainingTime % (60 * 60 * 1000)) / (60 * 1000));
-      const seconds = Math.floor((remainingTime % (60 * 1000)) / 1000);
-
-      if (hours < 1) {
-        reminder.expired = true;
-        listItem.style.textDecoration = "line-through";
-        timerText.textContent = "Expired";
+      listItem.addEventListener("click", () => {
         clearInterval(reminder.timerId);
-      } else if (hours > 24) {
-        timerText.textContent = "more than 24h";
-      } else if (hours > 0) {
-        timerText.textContent = `${hours}h`;
-      } else {
-        timerText.textContent = `${minutes}m`;
-      }
-    }, 1000);
-  });
+        reminders.splice(reminders.indexOf(reminder), 1);
+        saveReminders(); // Save the reminders to localStorage
+        displayReminders();
+      });
+
+      listItem.appendChild(reminderText);
+      listItem.appendChild(timerText);
+      reminderList.appendChild(listItem);
+
+      reminder.timerId = setInterval(() => {
+        const timeDiff = new Date().getTime() - reminder.time; // Calculate the time difference from the timestamp
+        const remainingTime = reminder.remainingTime - timeDiff;
+        const hours = Math.floor(remainingTime / (60 * 60 * 1000));
+        const minutes = Math.floor((remainingTime % (60 * 60 * 1000)) / (60 * 1000));
+        const seconds = Math.floor((remainingTime % (60 * 1000)) / 1000);
+
+        if (hours < 1) {
+          reminder.expired = true;
+          listItem.style.textDecoration = "line-through";
+          timerText.textContent = "Expired";
+          clearInterval(reminder.timerId);
+        } else if (hours > 24) {
+          timerText.textContent = "more than 24h";
+        } else if (hours > 0) {
+          timerText.textContent = `${hours}h`;
+        } else {
+          timerText.textContent = `${minutes}m`;
+        }
+      }, 1000);
+    });
 }
 
 function saveReminders() {
